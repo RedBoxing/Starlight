@@ -54,7 +54,7 @@ public:
 class MyMenu : public Starlight::UI::Menu {
 public:
     MyMenu() : Starlight::UI::Menu("My Menu") {
-        this->AddWindow(new MyWindow());
+        this->addWindow(new MyWindow());
     }
 };
 
