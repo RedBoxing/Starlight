@@ -1,6 +1,6 @@
 #include "starlight.hpp"
 
-void Starlight::Initialize(Starlight::UI::Menu *menu)
+void Starlight::Initialize(Starlight::UI::Overlay *overlay)
 {
-    Starlight::UI::Initialize(menu);
+    Starlight::UI::Initialize(overlay);
 }

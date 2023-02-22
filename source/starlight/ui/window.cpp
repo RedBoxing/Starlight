@@ -1,4 +1,5 @@
 #include "starlight/ui/window.hpp"
+#include <algorithm>
 
 Starlight::UI::Window::Window(std::string title, int x, int y, int width, int height, bool enabledDefault)
 {
@@ -30,18 +31,25 @@ void Starlight::UI::Window::render()
 
 void Starlight::UI::Window::handleInputs()
 {
-    /* if (this->enabled)
-     {
-         for (Element *element : this->elements)
-         {
-             // element->handleInputs();
-         }
-     }*/
 }
 
 void Starlight::UI::Window::addElement(Elements::Element *element)
 {
     this->elements.push_back(element);
+}
+
+void Starlight::UI::Window::removeElement(Elements::Element *element)
+{
+    auto it = std::find(this->elements.begin(), this->elements.end(), element);
+    if (it != this->elements.end())
+    {
+        this->elements.erase(it);
+    }
+}
+
+void Starlight::UI::Window::clearElements()
+{
+    this->elements.clear();
 }
 
 void Starlight::UI::Window::setTitleBar(bool enabled)

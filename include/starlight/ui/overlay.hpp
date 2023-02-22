@@ -7,13 +7,13 @@ namespace Starlight
 {
     namespace UI
     {
-        class Menu
+        class Overlay
         {
         public:
-            Menu();
+            Overlay();
 
             void update();
-            void handleInputs();
+            virtual void handleInputs();
 
             bool isFocused();
             void setFocused(bool focused);

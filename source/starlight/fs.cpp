@@ -56,22 +56,3 @@ void Starlight::FS::readFile(const char *path, void **data, size_t *size)
 
     nn::fs::CloseFile(fileHandle);
 }
-
-void Starlight::FS::loadFile(LoadData &loadData)
-{
-    nn::fs::FileHandle handle{};
-
-    EXL_ASSERT(Starlight::FS::doesFileExist(loadData.path), "Failed to Find File: %s", loadData.path);
-    R_ABORT_UNLESS(nn::fs::OpenFile(&handle, loadData.path, nn::fs::OpenMode_Read))
-
-    long size = 0;
-    nn::fs::GetFileSize(&size, handle);
-    long alignedSize = ALIGN_UP(size, loadData.alignment);
-    loadData.buffer = malloc(alignedSize);
-    loadData.bufSize = alignedSize;
-
-    EXL_ASSERT(loadData.buffer, "Failed to Allocate Buffer! File Size: %ld", size);
-    R_ABORT_UNLESS(nn::fs::ReadFile(handle, 0, loadData.buffer, size))
-
-    nn::fs::CloseFile(handle);
-}

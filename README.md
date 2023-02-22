@@ -11,50 +11,44 @@ A Framework designed to be used with [exlaunch](https://github.com/shadowninja10
 ```cpp
 #include <starlight.h>
 
-MyMenu* menu = nullptr;
-
-class MyWindow : public Starlight::UI::Window {
+class MyOtherMenu : public Starlight::UI::Elements::Menu
+{
 public:
-    MyWindow() : Starlight::UI::Window("My Window") {
-        this->setTitleBar(false);
-        this->setCollapse(false);
-        this->setResize(false);
-        this->setMove(false);
-        this->setBringToFront(true);
-        this->setNavFocus(true);
-
-        this->addElement("My Button", []() {
+    MyOtherMenu(Starlight::UI::Window *window)
+    {
+        this->addElement(new Starlight::UI::Elements::Title("My Other Menu", "Another subtitle"));
+        this->addElement(new Starlight::UI::Elements::Button("Notify Me!", [this]()
+        { 
             Starlight::UI::displayNotification("Hello World!", nn::TimeSpan::FromMilliSeconds(2500));
-        });
-    }
-
-    void handleInputs()
-    {
-        if (!this->isEnabled() && Starlight::HID::isButtonHold(nn::hid::NpadButton::ZL) && Starlight::HID::isButtonHold(nn::hid::NpadButton::ZR))
-        {
-            this->setEnabled(true);
-        }
-        else if (this->isEnabled() && Starlight::HID::isButtonHold(nn::hid::NpadButton::B))
-        {
-            this->setEnabled(false);
-        }
-    }
-
-    void onEnable()
-    {
-        menu->setFocused(true);
-    }
-
-    void onDisable()
-    {
-        menu->setFocused(false);
+        }));
     }
 };
 
-class MyMenu : public Starlight::UI::Menu {
+class MyMenu : public Starlight::UI::Elements::Menu
+{
 public:
-    MyMenu() : Starlight::UI::Menu("My Menu") {
-        this->addWindow(new MyWindow());
+    MyMenu(Starlight::UI::Window *window)
+    {
+        this->addElement(new Starlight::UI::Elements::Title("My Meny", "My Subtitle"));
+        this->addElement(new Starlight::UI::Elements::Button("My Other Menu", [this]()
+        { 
+            this->switchTo(new MyOtherMenu(this->getWindow())); 
+        }));
+    }
+};
+
+
+class MyOverlay : public Starlight::UI::Overlay {
+public:
+    MyOverlay() : Starlight::UI::Overlay("My Overlay") {
+        this->addWindow(Starlight::UI::Windows::MenuWindow::create<MyMenu>(this));
+    }
+};
+
+HOOK_DEFINE_TRAMPOLINE(MainInitHook){
+    static void Callback(){
+        R_ABORT_UNLESS(nn::fs::MountSdCardForDebug("sd"));
+        Orig();
     }
 };
 
@@ -63,9 +57,9 @@ extern "C" void exl_main(void *x0, void *x1)
     envSetOwnProcessHandle(exl::util::proc_handle::Get());
 
     exl::hook::Initialize();
+    MainInitHook::InstallAtSymbol("nnMain");
 
-    menu = new MyMenu();
-    Starlight::Initialize(menu);
+    Starlight::Initialize(new MyOverlat());
 }
 
 ```

@@ -15,11 +15,11 @@ void Starlight::UI::Elements::Title::render()
     ImGui::SetWindowFontScale(0.75f);
 
     ImGui::SetCursorPosX(20);
-    ImGui::PushStyleColor(ImGuiCol_Text, 0x303030FF);
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.3f, 0.3f, 0.3f, 1.0f));
     ImGui::Text(this->subtitle.c_str());
     ImGui::PopStyleColor();
 
     ImGui::SetWindowFontScale(1.0f);
 
-    ImGui::Spacing();
+    ImGui::Dummy(ImVec2(0.0f, 35.0f));
 }

@@ -6,5 +6,5 @@
 
 namespace Starlight
 {
-    void Initialize(Starlight::UI::Menu *menu);
+    void Initialize(Starlight::UI::Overlay *overlay);
 }

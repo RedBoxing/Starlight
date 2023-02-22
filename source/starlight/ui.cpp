@@ -23,7 +23,7 @@ nvn::TextureGetHeightFunc tempTexGetHeightFunc;
 nvn::WindowBuilderSetTexturesFunc tempWindowBuilderSetTexFunc;
 nvn::WindowSetCropFunc tempWindowSetCropFunc;
 
-Starlight::UI::Menu *mainMenu;
+Starlight::UI::Overlay *mainOverlay;
 
 bool isUIInitialized = false;
 
@@ -45,21 +45,21 @@ void setStyle(ImGuiStyle *style)
     style->ButtonTextAlign = ImVec2(0.1f, 0.5f);
 }
 
-void Starlight::UI::InitializeUI()
+bool Starlight::UI::InitializeUI()
 {
     if (nvnDevice && nvnQueue && nvnCmdBuf)
     {
-        /* ImGuiMemAllocFunc allocFunc = [](size_t size, void *user_data)
-         {
-             return mallocFuncPtr(size);
-         };
+        ImGuiMemAllocFunc allocFunc = [](size_t size, void *user_data)
+        {
+            return mallocFuncPtr(size);
+        };
 
-         ImGuiMemFreeFunc freeFunc = [](void *ptr, void *user_data)
-         {
-             freeFuncPtr(ptr);
-         };
+        ImGuiMemFreeFunc freeFunc = [](void *ptr, void *user_data)
+        {
+            freeFuncPtr(ptr);
+        };
 
-         ImGui::SetAllocatorFunctions(allocFunc, freeFunc, nullptr);*/
+        ImGui::SetAllocatorFunctions(allocFunc, freeFunc, nullptr);
 
         ImGui::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
@@ -103,6 +103,12 @@ void Starlight::UI::InitializeUI()
 
         ImguiNvnBackend::InitBackend(initInfo);
         Starlight::HID::Initialize();
+
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -110,7 +116,7 @@ void presentTexture(nvn::Queue *queue, nvn::Window *window, int texIndex)
 {
     if (isUIInitialized)
     {
-        mainMenu->update();
+        mainOverlay->update();
     }
 
     tempPresentTexFunc(queue, window, texIndex);
@@ -159,9 +165,9 @@ NVNboolean cmdBufInit(nvn::CommandBuffer *buffer, nvn::Device *device)
     NVNboolean result = tempBufferInitFuncPtr(buffer, device);
     nvnCmdBuf = buffer;
 
-    if (isUIInitialized)
+    if (!isUIInitialized)
     {
-        Starlight::UI::InitializeUI();
+        isUIInitialized = Starlight::UI::InitializeUI();
     }
 
     return result;
@@ -234,7 +240,7 @@ return result;
             int result = Orig(unkInt, state, count, port);                                         \
     if (!Starlight::HID::isReadingInput())                                                         \
     {                                                                                              \
-        if (mainMenu->isFocused())                                                                 \
+        if (mainOverlay->isFocused())                                                              \
         {                                                                                          \
             *state = nn::hid::Npad##type();                                                        \
         }                                                                                          \
@@ -250,9 +256,9 @@ INPUT_HOOK(JoyDualState);
 INPUT_HOOK(JoyLeftState);
 INPUT_HOOK(JoyRightState);
 
-void Starlight::UI::Initialize(Starlight::UI::Menu *menu)
+void Starlight::UI::Initialize(Starlight::UI::Overlay *overlay)
 {
-    mainMenu = menu;
+    mainOverlay = overlay;
 
     nn::ro::LookupSymbol(reinterpret_cast<uintptr_t *>(&mallocFuncPtr), "malloc");
     nn::ro::LookupSymbol(reinterpret_cast<uintptr_t *>(&freeFuncPtr), "free");

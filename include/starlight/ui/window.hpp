@@ -18,6 +18,8 @@ namespace Starlight
             virtual void handleInputs();
 
             void addElement(Elements::Element *element);
+            void removeElement(Elements::Element *element);
+            void clearElements();
 
             void setTitleBar(bool enabled);
             void setResize(bool enabled);
