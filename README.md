@@ -59,7 +59,7 @@ extern "C" void exl_main(void *x0, void *x1)
     exl::hook::Initialize();
     MainInitHook::InstallAtSymbol("nnMain");
 
-    Starlight::Initialize(new MyOverlat());
+    Starlight::Initialize(new MyOverlay());
 }
 
 ```
