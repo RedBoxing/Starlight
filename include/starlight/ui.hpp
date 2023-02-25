@@ -2,6 +2,7 @@
 
 #include "common.hpp"
 #include "nn/time.hpp"
+#include "nn/swkbd.h"
 
 #include "starlight/ui/overlay.hpp"
 #include "starlight/ui/window.hpp"
@@ -21,6 +22,8 @@ namespace Starlight
 
         void displayNotification(std::string text, nn::TimeSpan duration);
         void clearNotifications();
+
+        void showKeyboard(char *buffer, int size, const char *headerText, const char *subText, const char *guideText, nn::swkbd::KeyboardMode mode);
 
         namespace Utils
         {

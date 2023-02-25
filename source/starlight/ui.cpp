@@ -1,4 +1,4 @@
-#include "lib.hpp"
+#include "exlaunch.hpp"
 #include "starlight.hpp"
 
 #include "nn/pl.h"
@@ -277,4 +277,34 @@ void Starlight::UI::Utils::drawSeparator(float x, float y, float width, float ti
     float y2 = y + tickness;
 
     ImGui::GetWindowDrawList()->AddLine(ImVec2(x, y), ImVec2(x2, y2), color);
+}
+
+// TODO: FIX THIS
+void Starlight::UI::showKeyboard(char *buffer, int size, const char *headerText, const char *subText, const char *guideText, nn::swkbd::KeyboardMode mode)
+{
+    nn::swkbd::KeyboardConfig config;
+    nn::swkbd::MakePreset(&config, nn::swkbd::Preset::Default);
+
+    u16 *headerText16 = (u16 *)malloc(strlen(headerText) * 2);
+    nn::util::ConvertStringUtf8ToUtf16Native(headerText16, strlen(headerText) * 2, headerText, strlen(headerText));
+    nn::swkbd::SetHeaderText(&config, (const char16_t *)headerText16);
+
+    u16 *subText16 = (u16 *)malloc(strlen(subText) * 2);
+    nn::util::ConvertStringUtf8ToUtf16Native(subText16, strlen(subText) * 2, subText, strlen(subText));
+    nn::swkbd::SetSubText(&config, (const char16_t *)subText16);
+
+    u16 *guideText16 = (u16 *)malloc(strlen(guideText) * 2);
+    nn::util::ConvertStringUtf8ToUtf16Native(guideText16, strlen(guideText) * 2, guideText, strlen(guideText));
+    nn::swkbd::SetGuideText(&config, (const char16_t *)guideText16);
+
+    nn::swkbd::ShowKeyboardArg arg;
+    arg.keyboardConfig = config;
+
+    arg.workBufSize = 0x1000;
+    arg.workBuf = (char *)aligned_alloc(0x1000, arg.workBufSize);
+    EXL_ASSERT(arg.workBuf, "Failed to allocate memory for keyboard work buffer");
+
+    nn::swkbd::String string = {buffer, size};
+
+    nn::swkbd::ShowKeyboard(&string, arg);
 }

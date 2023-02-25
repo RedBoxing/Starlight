@@ -148,6 +148,18 @@ void Starlight::UI::Window::setFocusOnAppearing(bool enabled)
     }
 }
 
+void Starlight::UI::Window::setAlwaysAutoResize(bool enabled)
+{
+    if (enabled && this->flags & ImGuiWindowFlags_AlwaysAutoResize)
+    {
+        this->flags &= ~ImGuiWindowFlags_AlwaysAutoResize;
+    }
+    else if (!enabled && !(this->flags & ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        this->flags |= ImGuiWindowFlags_AlwaysAutoResize;
+    }
+}
+
 std::string Starlight::UI::Window::getTitle()
 {
     return this->title;

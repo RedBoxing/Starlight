@@ -1,5 +1,5 @@
 #include "starlight/fs.hpp"
-#include "lib/diag/assert.hpp"
+#include "exlaunch/diag/assert.hpp"
 #include "nn/fs.h"
 
 bool Starlight::FS::doesFileExist(const char *path)

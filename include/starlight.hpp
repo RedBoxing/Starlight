@@ -8,4 +8,9 @@
 namespace Starlight
 {
     void Initialize(Starlight::UI::Overlay *overlay);
+
+    namespace Utils
+    {
+        std::string ConvertToHex(void *data, size_t size, size_t outLength);
+    }
 }

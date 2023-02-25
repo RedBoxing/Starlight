@@ -29,6 +29,7 @@ namespace Starlight
             void setNavFocus(bool enabled);
             void setScrollbar(bool enabled);
             void setFocusOnAppearing(bool enabled);
+            void setAlwaysAutoResize(bool enabled);
 
             std::string getTitle();
             void setTitle(std::string title);

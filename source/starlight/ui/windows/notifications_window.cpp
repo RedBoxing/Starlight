@@ -1,6 +1,7 @@
 #include "starlight/ui/windows/notifications_window.hpp"
 #include "starlight/ui.hpp"
 #include "imgui.h"
+#include "imgui_internal.h"
 
 Starlight::UI::Windows::NotificationsWindow::NotificationsWindow() : Window("Notifications", 1280, 0, 250, 50, true)
 {
@@ -12,6 +13,13 @@ Starlight::UI::Windows::NotificationsWindow::NotificationsWindow() : Window("Not
     this->setNavFocus(false);
     this->setScrollbar(false);
     this->setFocusOnAppearing(false);
+    this->setAlwaysAutoResize(true);
+}
+
+float ParametricBlend(float t)
+{
+    float sqt = t * t;
+    return sqt / (2.0f * (sqt - t) + 1.0f);
 }
 
 void Starlight::UI::Windows::NotificationsWindow::render()
@@ -26,25 +34,20 @@ void Starlight::UI::Windows::NotificationsWindow::render()
 
         Notification *notification = &this->notifications[0];
 
-        int x = this->getX() - (this->getWidth() * notification->getDisplayPercent());
-
-        // max width before wrapping: this->getWidth() - 10
-        // starting from: x
-        // const float wrap_width = this->getWidth() - 10;
-        const ImVec2 text_size = ImGui::CalcTextSize(notification->getText().c_str(), (notification->getText().c_str() + notification->getText().size()) /*, false, wrap_width*/);
+        int x = this->getX() - (this->getWidth() * ParametricBlend(notification->getDisplayPercent()));
 
         ImGui::SetNextWindowPos(ImVec2(x, this->getY()));
-        ImGui::SetNextWindowSize(ImVec2(this->getWidth(), text_size.y + 20));
+        ImGui::SetNextWindowSize(ImVec2(this->getWidth(), 0));
         ImGui::Begin(this->getTitle().c_str(), nullptr, this->getFlags());
 
-        // ImGui::SetCursorPosY(15);
+        ImGui::Dummy(ImVec2(0, 10));
+        ImGui::SetCursorPosX(10);
 
-        ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + this->getWidth() - 10);
-
+        ImGui::PushTextWrapPos(ImGui::GetCursorPos().x + this->getWidth() - 20);
         ImGui::Text(notification->getText().c_str());
-
         ImGui::PopTextWrapPos();
 
+        ImGui::Dummy(ImVec2(0, 10));
         ImGui::End();
     }
 }
@@ -100,6 +103,8 @@ Starlight::UI::NotificationPhase Starlight::UI::Notification::getPhase()
 
 float Starlight::UI::Notification::getDisplayPercent()
 {
+    // https://stackoverflow.com/questions/13462001/ease-in-and-ease-out-animation-formula
+
     this->update();
     nn::TimeSpan elapsed = this->getTimeElapsed();
 
