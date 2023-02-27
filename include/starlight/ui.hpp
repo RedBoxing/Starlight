@@ -10,6 +10,7 @@
 
 #include "starlight/ui/elements/element.hpp"
 #include "starlight/ui/elements/button.hpp"
+#include "starlight/ui/elements/toggle_button.hpp"
 #include "starlight/ui/elements/title.hpp"
 #include "starlight/ui/elements/menu.hpp"
 

@@ -35,14 +35,15 @@ void setStyle(ImGuiStyle *style)
     ImVec4 *colors = style->Colors;
 
     colors[ImGuiCol_WindowBg] = ImVec4(0, 0, 0, 0.95f);
-    colors[ImGuiCol_Border] = ImVec4(0, 1, 0.86, 1);
+    colors[ImGuiCol_Border] = ImVec4(0, 1, 0.86f, 1);
 
     colors[ImGuiCol_Button] = ImVec4(0, 0, 0, 0);
     colors[ImGuiCol_ButtonHovered] = ImVec4(0, 0, 0, 1);
-    colors[ImGuiCol_ButtonActive] = ImVec4(0, 0.13, 0.13, 1);
+    colors[ImGuiCol_ButtonActive] = ImVec4(0, 0.13f, 0.13f, 1.0f);
 
     style->WindowBorderSize = 0;
     style->ButtonTextAlign = ImVec2(0.1f, 0.5f);
+    style->FramePadding = ImVec2(20.0f, 1.0f);
 }
 
 bool Starlight::UI::InitializeUI()

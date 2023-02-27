@@ -13,12 +13,14 @@ namespace Starlight
             class Button : public Element
             {
             public:
-                Button(std::string text, std::function<void()> onClick);
+                Button(std::string text, std::string value, std::function<void()> onClick);
 
                 void render();
+                void setValue(std::string value);
 
             private:
                 std::string text;
+                std::string value;
                 std::function<void()> onClick;
             };
         }

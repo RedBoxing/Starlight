@@ -1,13 +1,9 @@
 #include "starlight/hid.hpp"
+#include "nn/os/os_thread_api.hpp"
 
-nn::hid::NpadBaseState curControllerState;
+static nn::os::ThreadType thread;
+nn::hid::NpadBaseState controllerState;
 nn::hid::NpadBaseState prevControllerState;
-
-nn::hid::KeyboardState curKeyboardState{};
-nn::hid::KeyboardState prevKeyboardState{};
-
-nn::hid::MouseState curMouseState{};
-nn::hid::MouseState prevMouseState{};
 
 bool isReadInput = false;
 
@@ -40,80 +36,64 @@ void tryGetContState(nn::hid::NpadBaseState *state, ulong port)
 
     isReadInput = false;
 }
+/*
+static void hidPollerThread(void *arg)
+{
+    nn::hid::NpadBaseState *state = (nn::hid::NpadBaseState *)arg;
+
+    while (true)
+    {
+        nn::hid::GetNpadState((nn::hid::NpadHandheldState *)state, 0x20);
+        nn::os::SleepThread(nn::TimeSpan::FromMilliSeconds(20));
+    }
+}*/
 
 void Starlight::HID::Initialize()
 {
-    nn::hid::InitializeKeyboard();
-    nn::hid::InitializeMouse();
+    // nn::hid::InitializeKeyboard();
+    // nn::hid::InitializeMouse();
+
+    // nn::os::CreateThread(&thread, hidPollerThread, (void *)&controllerState, aligned_alloc(0x1000, 0x1000), 0x1000, 0x10, -2);
+    // nn::os::StartThread(&thread);
 }
 
 void Starlight::HID::updatePadState()
 {
-    prevControllerState = curControllerState;
-    tryGetContState(&curControllerState, 0);
+    prevControllerState = controllerState;
+    tryGetContState(&controllerState, 0);
 
-    prevKeyboardState = curKeyboardState;
-    nn::hid::GetKeyboardState(&curKeyboardState);
+    /*prevKeyboardState = curKeyboardState;
+     nn::hid::GetKeyboardState(&curKeyboardState);
 
-    prevMouseState = curMouseState;
-    nn::hid::GetMouseState(&curMouseState);
+     prevMouseState = curMouseState;
+     nn::hid::GetMouseState(&curMouseState);*/
 }
 
 bool Starlight::HID::isButtonHold(nn::hid::NpadButton button)
 {
-    return curControllerState.mButtons.isBitSet(button);
+    return controllerState.mButtons.isBitSet(button);
 }
 
 bool Starlight::HID::isButtonPressed(nn::hid::NpadButton button)
 {
-    return curControllerState.mButtons.isBitSet(button) && !prevControllerState.mButtons.isBitSet(button);
+    return controllerState.mButtons.isBitSet(button) && !prevControllerState.mButtons.isBitSet(button);
 }
 
 bool Starlight::HID::isButtonReleased(nn::hid::NpadButton button)
 {
-    return !curControllerState.mButtons.isBitSet(button) && prevControllerState.mButtons.isBitSet(button);
+    return !controllerState.mButtons.isBitSet(button) && prevControllerState.mButtons.isBitSet(button);
 }
 
-bool Starlight::HID::isMouseHold(nn::hid::MouseButton button)
+void Starlight::HID::getAnalogStickPos(float *x, float *y, bool isLeft)
 {
-    return curMouseState.buttons.isBitSet(button);
+    *x = isLeft ? controllerState.mAnalogStickL.X : controllerState.mAnalogStickR.X;
+    *y = isLeft ? controllerState.mAnalogStickL.Y : controllerState.mAnalogStickR.Y;
 }
 
-bool Starlight::HID::isMousePressed(nn::hid::MouseButton button)
+void Starlight::HID::getTouchPos(float *x, float *y)
 {
-    return curMouseState.buttons.isBitSet(button) && !prevMouseState.buttons.isBitSet(button);
-}
-
-bool Starlight::HID::isMouseReleased(nn::hid::MouseButton button)
-{
-    return !curMouseState.buttons.isBitSet(button) && prevMouseState.buttons.isBitSet(button);
-}
-
-bool Starlight::HID::isKeyHold(nn::hid::KeyboardKey button)
-{
-    return curKeyboardState.keys.isBitSet(button);
-}
-
-bool Starlight::HID::isKeyPressed(nn::hid::KeyboardKey button)
-{
-    return curKeyboardState.keys.isBitSet(button) && !prevKeyboardState.keys.isBitSet(button);
-}
-
-bool Starlight::HID::isKeyReleased(nn::hid::KeyboardKey button)
-{
-    return !curKeyboardState.keys.isBitSet(button) && prevKeyboardState.keys.isBitSet(button);
-}
-
-void Starlight::HID::getMouseCoords(float *x, float *y)
-{
-    *x = curMouseState.x;
-    *y = curMouseState.y;
-}
-
-void Starlight::HID::getScrollDelta(float *x, float *y)
-{
-    *x = curMouseState.wheelDeltaX;
-    *y = curMouseState.wheelDeltaY;
+    *x = 0;
+    *y = 0;
 }
 
 bool Starlight::HID::isReadingInput()
